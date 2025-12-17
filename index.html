@@ -271,6 +271,7 @@
         .marker-activity { border-color: #10b981; background: #d1fae5; }
         .marker-info { border-color: #ef4444; background: #fee2e2; }
         .marker-vendor { border-color: #ec4899; background: #fce7f3; }
+        .marker-photos { border-color: #06b6d4; background: #cffafe; }
     </style>
 </head>
 <body>
@@ -304,6 +305,18 @@
             <label class="layer-toggle active" data-layer="vendor">
                 <input type="checkbox" checked>
                 <span>🛍️ Vendors</span>
+            </label>
+            <label class="layer-toggle active" data-layer="photos">
+                <input type="checkbox" checked>
+                <span>📷 Photos</span>
+            </label>
+            <label class="layer-toggle active" data-layer="walkingPath">
+                <input type="checkbox" checked>
+                <span>🚶 Walking Path</span>
+            </label>
+            <label class="layer-toggle active" data-layer="areas">
+                <input type="checkbox" checked>
+                <span>📍 Areas</span>
             </label>
         </div>
 
@@ -378,7 +391,10 @@
                 restroom: L.layerGroup().addTo(map),
                 activity: L.layerGroup().addTo(map),
                 info: L.layerGroup().addTo(map),
-                vendor: L.layerGroup().addTo(map)
+                vendor: L.layerGroup().addTo(map),
+                walkingPath: L.layerGroup().addTo(map),
+                areas: L.layerGroup().addTo(map),
+                photos: L.layerGroup().addTo(map)
             };
 
             // Custom icon function
@@ -400,7 +416,8 @@
                     restroom: '🚻',
                     activity: '🎯',
                     info: 'ℹ️',
-                    vendor: '🛍️'
+                    vendor: '🛍️',
+                    photos: '📷'
                 };
 
                 const icon = createCustomIcon(categoryEmojis[category], category);
@@ -428,6 +445,117 @@
 
                 layers[category].addLayer(marker);
                 return marker;
+            }
+
+            // Function to add a walking path
+            function addWalkingPath(coordinates, options = {}) {
+                const defaultOptions = {
+                    color: '#4CAF50',
+                    weight: 4,
+                    opacity: 0.8,
+                    dashArray: '10, 10',
+                    lineCap: 'round',
+                    lineJoin: 'round'
+                };
+                
+                const pathOptions = { ...defaultOptions, ...options };
+                const polyline = L.polyline(coordinates, pathOptions);
+                
+                // Optional: Add arrows to show direction
+                if (options.showArrows) {
+                    const decorator = L.polylineDecorator(polyline, {
+                        patterns: [
+                            {
+                                offset: 25,
+                                repeat: 50,
+                                symbol: L.Symbol.arrowHead({
+                                    pixelSize: 10,
+                                    pathOptions: { 
+                                        fillOpacity: 1, 
+                                        weight: 0,
+                                        color: pathOptions.color
+                                    }
+                                })
+                            }
+                        ]
+                    });
+                    layers.walkingPath.addLayer(decorator);
+                }
+                
+                layers.walkingPath.addLayer(polyline);
+                return polyline;
+            }
+
+            // Function to add a labeled area/zone
+            function addArea(coordinates, label, options = {}) {
+                const defaultOptions = {
+                    color: '#3388ff',          // Border color
+                    fillColor: '#3388ff',      // Fill color
+                    fillOpacity: 0.2,          // Transparency (0.0 to 1.0)
+                    weight: 2,                 // Border thickness
+                    opacity: 0.8               // Border opacity
+                };
+                
+                const areaOptions = { ...defaultOptions, ...options };
+                
+                // Create the polygon
+                const polygon = L.polygon(coordinates, areaOptions);
+                
+                // Add label if provided
+                if (label) {
+                    // Calculate center of the polygon for label placement
+                    const bounds = polygon.getBounds();
+                    const center = bounds.getCenter();
+                    
+                    // Create a custom label marker
+                    const labelIcon = L.divIcon({
+                        html: `<div style="
+                            background: ${areaOptions.fillColor || areaOptions.color};
+                            color: white;
+                            padding: 6px 12px;
+                            border-radius: 4px;
+                            font-weight: 600;
+                            font-size: 14px;
+                            white-space: nowrap;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                            border: 2px solid white;
+                        ">${label}</div>`,
+                        className: '',
+                        iconSize: null,
+                        iconAnchor: [0, 0]
+                    });
+                    
+                    const labelMarker = L.marker(center, { 
+                        icon: labelIcon,
+                        interactive: false  // Label doesn't block clicks
+                    });
+                    
+                    layers.areas.addLayer(labelMarker);
+                }
+                
+                // Optional: Add popup with more info
+                if (options.description) {
+                    polygon.bindPopup(`
+                        <div style="padding: 10px;">
+                            <strong style="font-size: 16px;">${label}</strong>
+                            <p style="margin-top: 8px; margin-bottom: 0;">${options.description}</p>
+                        </div>
+                    `);
+                }
+                
+                layers.areas.addLayer(polygon);
+                return polygon;
+            }
+
+            // Function to add a rectangular area (easier than defining all corners)
+            function addRectangle(topLeft, bottomRight, label, options = {}) {
+                const coordinates = [
+                    topLeft,
+                    [topLeft[0], bottomRight[1]],
+                    bottomRight,
+                    [bottomRight[0], topLeft[1]]
+                ];
+                return addArea(coordinates, label, options);
             }
 
             // Toggle layer visibility
@@ -499,9 +627,9 @@
                 null);
 
             // INFORMATION Examples
-            addMarker(580, 226, 'info', 'Picture', 
-                'View of the Main Gym',
-                'IMG_8399.jpeg');
+            addMarker(550, 700, 'info', 'Information Desk', 
+                'Main information booth. Get event maps, schedules, and assistance.',
+                null);
 
             addMarker(200, 200, 'info', 'Entry Point', 
                 'Main entrance and check-in area.',
@@ -516,11 +644,143 @@
                 'School spirit wear and merchandise.',
                 null);
 
+            // PHOTO SPOTS Examples
+            addMarker(250, 450, 'photos', 'School Sign Photo Op', 
+                'Perfect spot for photos with the school sign!',
+                null);
+
+            addMarker(650, 550, 'photos', 'Mascot Photo Booth', 
+                'Meet the mascot and take photos! Available 2-4pm.',
+                null);
+
+            // ==========================================
+            // WALKING PATHS
+            // Add paths to guide attendees through the venue
+            // ==========================================
+
+            // Example: Main walkway from entrance to cafeteria
+            addWalkingPath([
+                [200, 200],   // Start point (entrance)
+                [300, 400],   // Turn point
+                [400, 600],   // Turn point
+                [500, 600]    // End point (cafeteria)
+            ], {
+                color: '#2196F3',      // Blue color
+                weight: 5,             // Line thickness
+                dashArray: '10, 5'     // Dashed pattern
+            });
+
+            // Example: Secondary path
+            addWalkingPath([
+                [150, 300],
+                [300, 500],
+                [450, 700]
+            ], {
+                color: '#FF9800',      // Orange color
+                weight: 4
+            });
+
+            // ==========================================
+            // TO ADD YOUR OWN WALKING PATHS:
+            // 1. Click on the map to find coordinates for each point
+            // 2. Create an array of points: [[y1, x1], [y2, x2], [y3, x3], ...]
+            // 3. Call addWalkingPath with your coordinates
+            // 
+            // Options you can customize:
+            // - color: any CSS color ('#FF0000', 'red', 'rgb(255,0,0)')
+            // - weight: line thickness (1-10)
+            // - opacity: 0.0 to 1.0
+            // - dashArray: '10, 5' for dashed, or omit for solid
+            // ==========================================
+
+            // ==========================================
+            // LABELED AREAS / ZONES
+            // Add semi-transparent shapes to highlight specific areas
+            // ==========================================
+
+            // Example: Staging Area (rectangle)
+            addRectangle(
+                [100, 100],      // Top-left corner [y, x]
+                [250, 300],      // Bottom-right corner [y, x]
+                'Staging Area',  // Label
+                {
+                    fillColor: '#FF6B6B',    // Red fill
+                    fillOpacity: 0.3,        // 30% transparent
+                    color: '#FF0000',        // Red border
+                    weight: 3,
+                    description: 'Staff and volunteers staging area. Restricted access.'
+                }
+            );
+
+            // Example: Performance Area (polygon - custom shape)
+            addArea(
+                [
+                    [350, 400],   // Point 1
+                    [350, 700],   // Point 2
+                    [500, 700],   // Point 3
+                    [500, 400]    // Point 4
+                ],
+                'Performance Stage',
+                {
+                    fillColor: '#9B59B6',    // Purple
+                    fillOpacity: 0.25,
+                    color: '#8E44AD',
+                    weight: 2,
+                    description: 'Main performance area. Live music from 2-5pm.'
+                }
+            );
+
+            // Example: Food Court Zone
+            addRectangle(
+                [450, 550],
+                [600, 750],
+                'Food Court',
+                {
+                    fillColor: '#F39C12',    // Orange
+                    fillOpacity: 0.2,
+                    color: '#E67E22'
+                }
+            );
+
+            // Example: Irregular shaped area (parking lot)
+            addArea(
+                [
+                    [100, 200],
+                    [150, 350],
+                    [200, 340],
+                    [180, 180]
+                ],
+                'Parking Zone A',
+                {
+                    fillColor: '#3498DB',    // Blue
+                    fillOpacity: 0.15,
+                    color: '#2980B9',
+                    weight: 2
+                }
+            );
+
+            // ==========================================
+            // TO ADD YOUR OWN AREAS:
+            // 
+            // METHOD 1 - Rectangle (easiest):
+            // addRectangle([top, left], [bottom, right], 'Label', {options});
+            //
+            // METHOD 2 - Custom Shape:
+            // addArea([[y1,x1], [y2,x2], [y3,x3], ...], 'Label', {options});
+            //
+            // Options you can customize:
+            // - fillColor: '#FF0000' or any CSS color
+            // - fillOpacity: 0.0 (invisible) to 1.0 (solid)
+            // - color: border color
+            // - weight: border thickness
+            // - description: shows in popup when clicked
+            // ==========================================
+
             // ==========================================
             // TO ADD YOUR OWN MARKERS:
             // 1. Click on the map to find coordinates (see console)
             // 2. Use addMarker(y, x, category, title, description, imageUrl)
-            // 3. Categories: 'parking', 'food', 'restroom', 'activity', 'info', 'vendor'
+            // 3. Categories: 'parking', 'food', 'restroom', 'activity', 'info', 'vendor', 'photos'
             // 4. For images, upload them to the same folder and reference filename
             // ==========================================
 
