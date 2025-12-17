@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summit Trail Middle School Event Map</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2d5f7f;
+            --secondary: #e8763b;
+            --accent: #4a9d9c;
+            --dark: #1a1a2e;
+            --light: #f5f5f5;
+            --border: #d4d4d4;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 30px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .controls {
+            padding: 25px 40px;
+            background: var(--light);
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .layer-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .layer-toggle:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .layer-toggle.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .layer-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .map-wrapper {
+            padding: 30px 40px 40px;
+            background: white;
+        }
+
+        #map {
+            width: 100%;
+            height: 70vh;
+            min-height: 500px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            background: #f0f0f0;
+            cursor: crosshair;
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .leaflet-popup-content {
+            margin: 0;
+            min-width: 250px;
+        }
+
+        .popup-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            padding: 15px 20px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .popup-body {
+            padding: 15px 20px;
+        }
+
+        .popup-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            margin-bottom: 12px;
+            border-radius: 8px;
+        }
+
+        .popup-description {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .popup-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--light);
+            color: var(--primary);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .legend {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .legend h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .legend-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px 25px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .header p {
+                font-size: 0.95rem;
+            }
+
+            .controls {
+                padding: 15px 20px;
+            }
+
+            .map-wrapper {
+                padding: 20px;
+            }
+
+            #map {
+                height: 60vh;
+            }
+        }
+
+        /* Custom marker styles */
+        .custom-marker {
+            background: white;
+            border: 3px solid;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .custom-marker:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .marker-parking { border-color: #3b82f6; background: #dbeafe; }
+        .marker-food { border-color: #f59e0b; background: #fef3c7; }
+        .marker-restroom { border-color: #8b5cf6; background: #ede9fe; }
+        .marker-activity { border-color: #10b981; background: #d1fae5; }
+        .marker-info { border-color: #ef4444; background: #fee2e2; }
+        .marker-vendor { border-color: #ec4899; background: #fce7f3; }
+        .marker-photos { border-color: #06b6d4; background: #cffafe; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Summit Trail Middle School</h1>
+            <p>Interactive Event Map - Navigate your experience</p>
+        </div>
+
+        <div class="controls" id="controls">
+            <label class="layer-toggle active" data-layer="parking">
+                <input type="checkbox" checked>
+                <span>🅿️ Parking</span>
+            </label>
+            <label class="layer-toggle active" data-layer="food">
+                <input type="checkbox" checked>
+                <span>🍕 Food & Drinks</span>
+            </label>
+            <label class="layer-toggle active" data-layer="restroom">
+                <input type="checkbox" checked>
+                <span>🚻 Restrooms</span>
+            </label>
+            <label class="layer-toggle active" data-layer="activity">
+                <input type="checkbox" checked>
+                <span>🎯 Activities</span>
+            </label>
+            <label class="layer-toggle active" data-layer="info">
+                <input type="checkbox" checked>
+                <span>ℹ️ Information</span>
+            </label>
+            <label class="layer-toggle active" data-layer="vendor">
+                <input type="checkbox" checked>
+                <span>🛍️ Vendors</span>
+            </label>
+            <label class="layer-toggle active" data-layer="photos">
+                <input type="checkbox" checked>
+                <span>📷 Photos</span>
+            </label>
+            <label class="layer-toggle active" data-layer="walkingPath">
+                <input type="checkbox" checked>
+                <span>🚶 Walking Path</span>
+            </label>
+            <label class="layer-toggle active" data-layer="areas">
+                <input type="checkbox" checked>
+                <span>📍 Areas</span>
+            </label>
+        </div>
+
+        <div class="map-wrapper">
+            <div id="map"></div>
+            
+            <div class="legend">
+                <h3>How to Use This Map</h3>
+                <div class="legend-item">
+                    <div class="legend-icon" style="background: #dbeafe; border: 3px solid #3b82f6;">🅿️</div>
+                    <span><strong>Click on markers</strong> to see photos and details</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon" style="background: #fef3c7; border: 3px solid #f59e0b;">🍕</div>
+                    <span><strong>Toggle categories</strong> above to filter what you see</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-icon" style="background: #ede9fe; border: 3px solid #8b5cf6;">🚻</div>
+                    <span><strong>Zoom and pan</strong> to explore different areas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Leaflet first -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Then run our map code -->
+    <script>
+        // Check if Leaflet loaded
+        if (typeof L === 'undefined') {
+            document.getElementById('map').innerHTML = '<div style="padding: 40px; text-align: center; color: red;">Error: Leaflet library failed to load. Please check your internet connection.</div>';
+        } else {
+            console.log('Leaflet loaded successfully!');
+        }
+
+        // Global variables
+        let map;
+        let layers = {};
+
+        // Initialize map after DOM and Leaflet are fully loaded
+        window.addEventListener('load', function() {
+            if (typeof L === 'undefined') {
+                console.error('Leaflet (L) is not defined!');
+                return;
+            }
+
+            console.log('Starting map initialization...');
+            // Initialize the map
+            map = L.map('map', {
+                crs: L.CRS.Simple,
+                minZoom: -1,
+                maxZoom: 2,
+                zoomSnap: 0.25,
+                zoomDelta: 0.5
+            });
+
+            // Image dimensions - adjust based on your actual image
+            const imageUrl = 'school_map.png';
+            const imageBounds = [[0, 0], [900, 1400]];
+
+            // Add the floor plan image
+            L.imageOverlay(imageUrl, imageBounds).addTo(map);
+
+            // Set initial view
+            map.fitBounds(imageBounds);
+
+            // Layer groups for different categories
+            layers = {
+                parking: L.layerGroup().addTo(map),
+                food: L.layerGroup().addTo(map),
+                restroom: L.layerGroup().addTo(map),
+                activity: L.layerGroup().addTo(map),
+                info: L.layerGroup().addTo(map),
+                vendor: L.layerGroup().addTo(map),
+                walkingPath: L.layerGroup().addTo(map),
+                areas: L.layerGroup().addTo(map),
+                photos: L.layerGroup().addTo(map)
+            };
+
+            // Custom icon function
+            function createCustomIcon(emoji, category) {
+                return L.divIcon({
+                    html: `<div class="custom-marker marker-${category}">${emoji}</div>`,
+                    className: '',
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18],
+                    popupAnchor: [0, -18]
+                });
+            }
+
+            // Function to add a marker
+            function addMarker(lat, lng, category, title, description, imageUrl) {
+                const categoryEmojis = {
+                    parking: '🅿️',
+                    food: '🍕',
+                    restroom: '🚻',
+                    activity: '🎯',
+                    info: 'ℹ️',
+                    vendor: '🛍️',
+                    photos: '📷'
+                };
+
+                const icon = createCustomIcon(categoryEmojis[category], category);
+                
+                let popupContent = `
+                    <div class="popup-header">${title}</div>
+                    <div class="popup-body">
+                `;
+                
+                if (imageUrl) {
+                    popupContent += `<img src="${imageUrl}" alt="${title}" class="popup-image">`;
+                }
+                
+                popupContent += `
+                        <div class="popup-description">${description}</div>
+                        <span class="popup-category">${category.toUpperCase()}</span>
+                    </div>
+                `;
+
+                const marker = L.marker([lat, lng], { icon: icon })
+                    .bindPopup(popupContent, {
+                        maxWidth: 300,
+                        className: 'custom-popup'
+                    });
+
+                layers[category].addLayer(marker);
+                return marker;
+            }
+
+            // Function to add a walking path
+            function addWalkingPath(coordinates, options = {}) {
+                const defaultOptions = {
+                    color: '#4CAF50',
+                    weight: 4,
+                    opacity: 0.8,
+                    dashArray: '10, 10',
+                    lineCap: 'round',
+                    lineJoin: 'round'
+                };
+                
+                const pathOptions = { ...defaultOptions, ...options };
+                const polyline = L.polyline(coordinates, pathOptions);
+                
+                // Optional: Add arrows to show direction
+                if (options.showArrows) {
+                    const decorator = L.polylineDecorator(polyline, {
+                        patterns: [
+                            {
+                                offset: 25,
+                                repeat: 50,
+                                symbol: L.Symbol.arrowHead({
+                                    pixelSize: 10,
+                                    pathOptions: { 
+                                        fillOpacity: 1, 
+                                        weight: 0,
+                                        color: pathOptions.color
+                                    }
+                                })
+                            }
+                        ]
+                    });
+                    layers.walkingPath.addLayer(decorator);
+                }
+                
+                layers.walkingPath.addLayer(polyline);
+                return polyline;
+            }
+
+            // Function to add a labeled area/zone
+            function addArea(coordinates, label, options = {}) {
+                const defaultOptions = {
+                    color: '#3388ff',          // Border color
+                    fillColor: '#3388ff',      // Fill color
+                    fillOpacity: 0.2,          // Transparency (0.0 to 1.0)
+                    weight: 2,                 // Border thickness
+                    opacity: 0.8               // Border opacity
+                };
+                
+                const areaOptions = { ...defaultOptions, ...options };
+                
+                // Create the polygon
+                const polygon = L.polygon(coordinates, areaOptions);
+                
+                // Add label if provided
+                if (label) {
+                    // Calculate center of the polygon for label placement
+                    const bounds = polygon.getBounds();
+                    const center = bounds.getCenter();
+                    
+                    // Create a custom label marker
+                    const labelIcon = L.divIcon({
+                        html: `<div style="
+                            background: ${areaOptions.fillColor || areaOptions.color};
+                            color: white;
+                            padding: 6px 12px;
+                            border-radius: 4px;
+                            font-weight: 600;
+                            font-size: 14px;
+                            white-space: nowrap;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                            border: 2px solid white;
+                        ">${label}</div>`,
+                        className: '',
+                        iconSize: null,
+                        iconAnchor: [0, 0]
+                    });
+                    
+                    const labelMarker = L.marker(center, { 
+                        icon: labelIcon,
+                        interactive: false  // Label doesn't block clicks
+                    });
+                    
+                    layers.areas.addLayer(labelMarker);
+                }
+                
+                // Optional: Add popup with more info
+                if (options.description) {
+                    polygon.bindPopup(`
+                        <div style="padding: 10px;">
+                            <strong style="font-size: 16px;">${label}</strong>
+                            <p style="margin-top: 8px; margin-bottom: 0;">${options.description}</p>
+                        </div>
+                    `);
+                }
+                
+                layers.areas.addLayer(polygon);
+                return polygon;
+            }
+
+            // Function to add a rectangular area (easier than defining all corners)
+            function addRectangle(topLeft, bottomRight, label, options = {}) {
+                const coordinates = [
+                    topLeft,
+                    [topLeft[0], bottomRight[1]],
+                    bottomRight,
+                    [bottomRight[0], topLeft[1]]
+                ];
+                return addArea(coordinates, label, options);
+            }
+
+            // Toggle layer visibility
+            window.toggleLayer = function(layerName) {
+                const toggle = document.querySelector(`[data-layer="${layerName}"]`);
+                const checkbox = toggle.querySelector('input[type="checkbox"]');
+                
+                if (checkbox.checked) {
+                    map.addLayer(layers[layerName]);
+                    toggle.classList.add('active');
+                } else {
+                    map.removeLayer(layers[layerName]);
+                    toggle.classList.remove('active');
+                }
+            };
+
+            // Add event listeners to toggles
+            document.querySelectorAll('.layer-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    if (e.target.type !== 'checkbox') {
+                        const checkbox = this.querySelector('input[type="checkbox"]');
+                        checkbox.checked = !checkbox.checked;
+                    }
+                    const layerName = this.getAttribute('data-layer');
+                    toggleLayer(layerName);
+                });
+            });
+
+            // ==========================================
+            // SAMPLE MARKERS - Replace these with your actual event locations
+            // Coordinates are [y, x] where y is vertical (0 = top, 1000 = bottom)
+            // and x is horizontal (0 = left, 1200 = right)
+            // ==========================================
+
+            // PARKING Examples
+            addMarker(150, 300, 'parking', 'Main Parking Lot', 
+                'Primary parking area with handicap accessible spaces. Enter from Summit Landsburg Rd.',
+                null);
+
+            addMarker(850, 1050, 'parking', 'Overflow Parking', 
+                'Additional parking available in the lower lot.',
+                null);
+
+            // FOOD & DRINKS Examples
+            addMarker(500, 600, 'food', 'Main Cafeteria', 
+                'Hot meals, snacks, and beverages available. Indoor seating.',
+                null);
+
+            addMarker(400, 900, 'food', 'Snack Stand', 
+                'Quick snacks, coffee, and soft drinks.',
+                null);
+
+            // RESTROOM Examples
+            addMarker(450, 400, 'restroom', 'Main Restrooms', 
+                'Accessible restrooms with changing tables.',
+                null);
+
+            addMarker(650, 650, 'restroom', 'Restrooms', 
+                'Additional facilities near the cafeteria.',
+                null);
+
+            // ACTIVITIES Examples
+            addMarker(300, 800, 'activity', 'Activity Station 1', 
+                'Kids crafts and games. All ages welcome!',
+                null);
+
+            addMarker(700, 900, 'activity', 'Activity Station 2', 
+                'Science demonstrations and hands-on experiments.',
+                null);
+
+            // INFORMATION Examples
+            addMarker(550, 700, 'info', 'Information Desk', 
+                'Main information booth. Get event maps, schedules, and assistance.',
+                null);
+
+            addMarker(200, 200, 'info', 'Entry Point', 
+                'Main entrance and check-in area.',
+                null);
+
+            // VENDOR Examples
+            addMarker(350, 500, 'vendor', 'Vendor Booth 1', 
+                'Local artisan crafts and handmade goods.',
+                null);
+
+            addMarker(600, 800, 'vendor', 'Vendor Booth 2', 
+                'School spirit wear and merchandise.',
+                null);
+
+            // PHOTO SPOTS Examples
+            addMarker(250, 450, 'photos', 'School Sign Photo Op', 
+                'Perfect spot for photos with the school sign!',
+                null);
+
+            addMarker(650, 550, 'photos', 'Mascot Photo Booth', 
+                'Meet the mascot and take photos! Available 2-4pm.',
+                null);
+
+            // ==========================================
+            // WALKING PATHS
+            // Add paths to guide attendees through the venue
+            // ==========================================
+
+            // Example: Main walkway from entrance to cafeteria
+            addWalkingPath([
+                [200, 200],   // Start point (entrance)
+                [300, 400],   // Turn point
+                [400, 600],   // Turn point
+                [500, 600]    // End point (cafeteria)
+            ], {
+                color: '#2196F3',      // Blue color
+                weight: 5,             // Line thickness
+                dashArray: '10, 5'     // Dashed pattern
+            });
+
+            // Example: Secondary path
+            addWalkingPath([
+                [150, 300],
+                [300, 500],
+                [450, 700]
+            ], {
+                color: '#FF9800',      // Orange color
+                weight: 4
+            });
+
+            // ==========================================
+            // TO ADD YOUR OWN WALKING PATHS:
+            // 1. Click on the map to find coordinates for each point
+            // 2. Create an array of points: [[y1, x1], [y2, x2], [y3, x3], ...]
+            // 3. Call addWalkingPath with your coordinates
+            // 
+            // Options you can customize:
+            // - color: any CSS color ('#FF0000', 'red', 'rgb(255,0,0)')
+            // - weight: line thickness (1-10)
+            // - opacity: 0.0 to 1.0
+            // - dashArray: '10, 5' for dashed, or omit for solid
+            // ==========================================
+
+            // ==========================================
+            // LABELED AREAS / ZONES
+            // Add semi-transparent shapes to highlight specific areas
+            // ==========================================
+
+            // Example: Staging Area (rectangle)
+            addRectangle(
+                [100, 100],      // Top-left corner [y, x]
+                [250, 300],      // Bottom-right corner [y, x]
+                'Staging Area',  // Label
+                {
+                    fillColor: '#FF6B6B',    // Red fill
+                    fillOpacity: 0.3,        // 30% transparent
+                    color: '#FF0000',        // Red border
+                    weight: 3,
+                    description: 'Staff and volunteers staging area. Restricted access.'
+                }
+            );
+
+            // Example: Performance Area (polygon - custom shape)
+            addArea(
+                [
+                    [350, 400],   // Point 1
+                    [350, 700],   // Point 2
+                    [500, 700],   // Point 3
+                    [500, 400]    // Point 4
+                ],
+                'Performance Stage',
+                {
+                    fillColor: '#9B59B6',    // Purple
+                    fillOpacity: 0.25,
+                    color: '#8E44AD',
+                    weight: 2,
+                    description: 'Main performance area. Live music from 2-5pm.'
+                }
+            );
+
+            // Example: Food Court Zone
+            addRectangle(
+                [450, 550],
+                [600, 750],
+                'Food Court',
+                {
+                    fillColor: '#F39C12',    // Orange
+                    fillOpacity: 0.2,
+                    color: '#E67E22'
+                }
+            );
+
+            // Example: Irregular shaped area (parking lot)
+            addArea(
+                [
+                    [100, 200],
+                    [150, 350],
+                    [200, 340],
+                    [180, 180]
+                ],
+                'Parking Zone A',
+                {
+                    fillColor: '#3498DB',    // Blue
+                    fillOpacity: 0.15,
+                    color: '#2980B9',
+                    weight: 2
+                }
+            );
+
+            // ==========================================
+            // TO ADD YOUR OWN AREAS:
+            // 
+            // METHOD 1 - Rectangle (easiest):
+            // addRectangle([top, left], [bottom, right], 'Label', {options});
+            //
+            // METHOD 2 - Custom Shape:
+            // addArea([[y1,x1], [y2,x2], [y3,x3], ...], 'Label', {options});
+            //
+            // Options you can customize:
+            // - fillColor: '#FF0000' or any CSS color
+            // - fillOpacity: 0.0 (invisible) to 1.0 (solid)
+            // - color: border color
+            // - weight: border thickness
+            // - description: shows in popup when clicked
+            // ==========================================
+
+            // ==========================================
+            // TO ADD YOUR OWN MARKERS:
+            // 1. Click on the map to find coordinates (see console)
+            // 2. Use addMarker(y, x, category, title, description, imageUrl)
+            // 3. Categories: 'parking', 'food', 'restroom', 'activity', 'info', 'vendor', 'photos'
+            // 4. For images, upload them to the same folder and reference filename
+            // ==========================================
+
+            // Helper: Click map to get coordinates (remove this in production)
+            map.on('click', function(e) {
+                const coords = e.latlng;
+                console.log(`Clicked at: [${Math.round(coords.lat)}, ${Math.round(coords.lng)}]`);
+            });
+
+            // Make map responsive
+            window.addEventListener('resize', function() {
+                map.invalidateSize();
+            });
+        });
+    </script>
+</body>
+</html>
