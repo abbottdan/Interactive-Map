@@ -698,22 +698,35 @@
             // Add semi-transparent shapes to highlight specific areas
             // ==========================================
 
-            // Example: Staging Area (rectangle)
+            // Competition Space
             addRectangle(
-                [100, 100],      // Top-left corner [y, x]
-                [250, 300],      // Bottom-right corner [y, x]
-                'Staging Area',  // Label
+                [765, 30],      // Top-left corner [y, x]
+                [563, 226],      // Bottom-right corner [y, x]
+                'Competition Space',  // Label
                 {
                     fillColor: '#FF6B6B',    // Red fill
-                    fillOpacity: 0.3,        // 30% transparent
+                    fillOpacity: 0.2,        // 30% transparent
                     color: '#FF0000',        // Red border
                     weight: 3,
-                    description: 'Staff and volunteers staging area. Restricted access.'
+                    description: 'Competition space.  Access limited during performances.'
                 }
             );
 
+            // Equipment Warm Up
+            addRectangle(
+                [879, 22],      // Top-left corner [y, x]
+                [787, 210],      // Bottom-right corner [y, x]
+                'Equipment Warm Up Space',  // Label
+                {
+                    fillColor: '#FF6B6B',    // Red fill
+                    fillOpacity: 0.2,        // 30% transparent
+                    color: '#FF0000',        // Red border
+                    weight: 3,
+                    description: 'Competition space.  Access limited during performances.'
+                }
+            );
             // Example: Performance Area (polygon - custom shape)
-            addArea(
+            /*addArea(
                 [
                     [350, 400],   // Point 1
                     [350, 700],   // Point 2
@@ -757,7 +770,7 @@
                     color: '#2980B9',
                     weight: 2
                 }
-            );
+            );*/
 
             // ==========================================
             // TO ADD YOUR OWN AREAS:
