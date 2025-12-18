@@ -295,17 +295,9 @@
                 <input type="checkbox" checked>
                 <span>🚻 Restrooms</span>
             </label>
-            <label class="layer-toggle active" data-layer="activity">
-                <input type="checkbox" checked>
-                <span>🎯 Activities</span>
-            </label>
             <label class="layer-toggle active" data-layer="info">
                 <input type="checkbox" checked>
                 <span>ℹ️ Information</span>
-            </label>
-            <label class="layer-toggle active" data-layer="vendor">
-                <input type="checkbox" checked>
-                <span>🛍️ Vendors</span>
             </label>
             <label class="layer-toggle active" data-layer="photos">
                 <input type="checkbox" checked>
@@ -390,9 +382,7 @@
                 parking: L.layerGroup().addTo(map),
                 food: L.layerGroup().addTo(map),
                 restroom: L.layerGroup().addTo(map),
-                activity: L.layerGroup().addTo(map),
                 info: L.layerGroup().addTo(map),
-                vendor: L.layerGroup().addTo(map),
                 walkingPath: L.layerGroup().addTo(map),
                 areas: L.layerGroup().addTo(map),
                 photos: L.layerGroup().addTo(map)
@@ -415,9 +405,7 @@
                     parking: '🅿️',
                     food: '🍕',
                     restroom: '🚻',
-                    activity: '🎯',
                     info: 'ℹ️',
-                    vendor: '🛍️',
                     photos: '📷'
                 };
 
@@ -619,31 +607,9 @@
                 'Participant Restrooms',
                 null);
 
-            // ACTIVITIES Examples
-            addMarker(300, 800, 'activity', 'Activity Station 1', 
-                'Kids crafts and games. All ages welcome!',
-                null);
-
-            addMarker(700, 900, 'activity', 'Activity Station 2', 
-                'Science demonstrations and hands-on experiments.',
-                null);
-
             // INFORMATION Examples
-            addMarker(550, 700, 'info', 'Information Desk', 
-                'Main information booth. Get event maps, schedules, and assistance.',
-                null);
-
-            addMarker(200, 200, 'info', 'Entry Point', 
-                'Main entrance and check-in area.',
-                null);
-
-            // VENDOR Examples
-            addMarker(350, 500, 'vendor', 'Vendor Booth 1', 
-                'Local artisan crafts and handmade goods.',
-                null);
-
-            addMarker(600, 800, 'vendor', 'Vendor Booth 2', 
-                'School spirit wear and merchandise.',
+            addMarker(571, 249, 'info', 'Ticket Sales', 
+                'Ticket sales and check in.',
                 null);
 
             // PHOTO SPOTS Examples
@@ -711,10 +677,11 @@
 
             // Example: Main walkway from entrance to cafeteria
             addWalkingPath([
-                [200, 200],   // Start point (entrance)
-                [300, 400],   // Turn point
-                [400, 600],   // Turn point
-                [500, 600]    // End point (cafeteria)
+                [548, 957],   // Start point (entrance)
+                [492, 1002],   // Turn point
+                [457, 986],   // Turn point
+                [451, 966],    // End point (cafeteria)
+                [480, 920]
             ], {
                 color: '#2196F3',      // Blue color
                 weight: 5,             // Line thickness
@@ -853,3 +820,4 @@
     </script>
 </body>
 </html>
+
