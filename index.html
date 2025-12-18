@@ -494,22 +494,18 @@
                         const endPoint = coordinates[pathLength - 1];
                         const beforeEnd = coordinates[pathLength - 2];
                         
-                        // Calculate angle: from beforeMid TO midPoint
+                        // Calculate angle: from beforeEnd TO endPoint
                         // In Leaflet, Y increases downward, so we need to flip it
-                        const dx = midPoint[1] - beforeMid[1];  // x difference (left-right)
-                        const dy = -(midPoint[0] - beforeMid[0]);  // y difference (NEGATED because Y axis is flipped)
+                        const dx = endPoint[1] - beforeEnd[1];  // x difference (left-right)
+                        const dy = -(endPoint[0] - beforeEnd[0]);  // y difference (NEGATED because Y axis is flipped)
                         const angle = (Math.atan2(dy, dx) * 180 / Math.PI) - 90;  // -90 to point arrow forward
                         
                         const arrowIcon = L.divIcon({
-                            html: `<div style="
-                                width: 0;
-                                height: 0;
-                                border-left: ${arrowSize}px solid transparent;
-                                border-right: ${arrowSize}px solid transparent;
-                                border-bottom: ${arrowSize * 1.5}px solid ${pathOptions.color};
-                                transform: rotate(${angle}deg);
-                                filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
-                            "></div>`,
+                            html: `<div style="transform: rotate(${angle}deg);">
+                                <svg width="${arrowSize * 2}" height="${arrowSize * 2}" viewBox="0 0 24 24" style="filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));">
+                                    <path d="M12 2 L2 22 L12 18 L22 22 Z" fill="${pathOptions.color}" stroke="white" stroke-width="1"/>
+                                </svg>
+                            </div>`,
                             className: '',
                             iconSize: [arrowSize * 2, arrowSize * 2],
                             iconAnchor: [arrowSize, arrowSize]
@@ -528,19 +524,19 @@
                         const midIndex = Math.floor(pathLength / 2);
                         const midPoint = coordinates[midIndex];
                         const beforeMid = coordinates[midIndex - 1];
-                        const angle = Math.atan2(midPoint[0] - beforeMid[0], midPoint[1] - beforeMid[1]) * 180 / Math.PI;
+                        
+                        // Calculate angle: from beforeMid TO midPoint
+                        // In Leaflet, Y increases downward, so we need to flip it
+                        const dx = midPoint[1] - beforeMid[1];  // x difference (left-right)
+                        const dy = -(midPoint[0] - beforeMid[0]);  // y difference (NEGATED because Y axis is flipped)
+                        const angle = (Math.atan2(dy, dx) * 180 / Math.PI) - 90;  // -90 to point arrow forward
                         
                         const arrowIcon = L.divIcon({
-                            html: `<div style="
-                                width: 0;
-                                height: 0;
-                                border-left: ${arrowSize * 0.8}px solid transparent;
-                                border-right: ${arrowSize * 0.8}px solid transparent;
-                                border-bottom: ${arrowSize * 1.2}px solid ${pathOptions.color};
-                                transform: rotate(${angle}deg);
-                                filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
-                                opacity: 0.8;
-                            "></div>`,
+                            html: `<div style="transform: rotate(${angle}deg);">
+                                <svg width="${arrowSize * 1.6}" height="${arrowSize * 1.6}" viewBox="0 0 24 24" style="filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3)); opacity: 0.8;">
+                                    <path d="M12 2 L2 22 L12 18 L22 22 Z" fill="${pathOptions.color}" stroke="white" stroke-width="1"/>
+                                </svg>
+                            </div>`,
                             className: '',
                             iconSize: [arrowSize * 1.6, arrowSize * 1.6],
                             iconAnchor: [arrowSize * 0.8, arrowSize * 0.8]
@@ -770,8 +766,9 @@
                 color: '#2196F3',      // Blue color
                 weight: 5,             // Line thickness
                 dashArray: '10, 5',     // Dashed pattern
-                label: 'Staging to Body Warm Up',
-                          
+                label: 'Staging to Body Warm Up'
+                //arrowSize: 15,
+                //showMidArrow: false
             });
 
             // Example: Secondary path
