@@ -654,6 +654,7 @@
             });
 
 
+            
             // ==========================================
             // MARKERS 
             // Coordinates are [y, x] where y is vertical (0 = top, 1000 = bottom)
@@ -755,7 +756,7 @@
             // Add paths to guide attendees through the venue
             // ==========================================
 
-            // Example: Main walkway from entrance to cafeteria
+            // Staging to body warmup
             addWalkingPath([
                 [548, 957],   // Start point (entrance)
                 [492, 1002],   // Turn point
@@ -766,19 +767,33 @@
                 color: '#2196F3',      // Blue color
                 weight: 5,             // Line thickness
                 dashArray: '10, 5',     // Dashed pattern
-                label: 'Staging to Body Warm Up'
-                //arrowSize: 15,
-                //showMidArrow: false
+                label: 'Staging to Body Warm Up',
+                arrowSize: 12,
+                showMidArrow: false
             });
 
-            // Example: Secondary path
+            // Body warmup to Equipment Warmup
             addWalkingPath([
-                [150, 300],
-                [300, 500],
-                [450, 700]
+                [489, 902],
+                [501, 862],
+                [506, 827],
+                [623, 688],
+                [625, 617],
+                [706, 617],
+                [712, 434],
+                [789, 417],
+                [839, 373],
+                [840, 245],
+                [784, 237],
+                [783, 197],
+                [819, 173]
             ], {
-                color: '#FF9800',      // Orange color
-                weight: 4
+                color: '#2196F3',      // Orange color
+                weight: 5
+                dashArray: '10, 5',     // Dashed pattern
+                label: 'Body Warm Up to Equipment Warm Up',
+                arrowSize: 12,
+                showMidArrow: true;
             });
 
             // ==========================================
@@ -903,3 +918,4 @@
     </script>
 </body>
 </html>
+
