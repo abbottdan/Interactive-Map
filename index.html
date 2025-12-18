@@ -493,7 +493,12 @@
                     if (pathLength >= 2) {
                         const endPoint = coordinates[pathLength - 1];
                         const beforeEnd = coordinates[pathLength - 2];
-                        const angle = Math.atan2(endPoint[0] - beforeEnd[0], endPoint[1] - beforeEnd[1]) * 180 / Math.PI;
+                        
+                        // Calculate angle: from beforeEnd TO endPoint
+                        // atan2(dy, dx) where dy = y2-y1, dx = x2-x1
+                        const dx = endPoint[1] - beforeEnd[1];  // x difference
+                        const dy = endPoint[0] - beforeEnd[0];  // y difference
+                        const angle = Math.atan2(dx, dy) * 180 / Math.PI;
                         
                         const arrowIcon = L.divIcon({
                             html: `<div style="
@@ -765,7 +770,8 @@
                 color: '#2196F3',      // Blue color
                 weight: 5,             // Line thickness
                 dashArray: '10, 5',     // Dashed pattern
-                label: 'Staging to Body Warm Up'
+                label: 'Staging to Body Warm Up',
+                          
             });
 
             // Example: Secondary path
