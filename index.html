@@ -585,8 +585,9 @@
                 });
             });
 
+            
             // ==========================================
-            // SAMPLE MARKERS - Replace these with your actual event locations
+            // MARKERS 
             // Coordinates are [y, x] where y is vertical (0 = top, 1000 = bottom)
             // and x is horizontal (0 = left, 1200 = right)
             // ==========================================
@@ -601,21 +602,21 @@
                 null);
 
             // FOOD & DRINKS Examples
-            addMarker(500, 600, 'food', 'Main Cafeteria', 
-                'Hot meals, snacks, and beverages available. Indoor seating.',
+            addMarker(664, 249, 'food', 'Concessions Tables', 
+                'Soda, water, coffee, hot chocolate, chips, candy, etc',
                 null);
 
-            addMarker(400, 900, 'food', 'Snack Stand', 
-                'Quick snacks, coffee, and soft drinks.',
+            addMarker(537, 208, 'food', 'Hot food', 
+                '1-2 Canopys, 2 grills, hot dogs, hamburgers, veggie burgers, etc',
                 null);
 
             // RESTROOM Examples
-            addMarker(450, 400, 'restroom', 'Main Restrooms', 
-                'Accessible restrooms with changing tables.',
+            addMarker(597, 288, 'restroom', 'Main Visitor Restrooms', 
+                'Main Visitor Restrooms',
                 null);
 
-            addMarker(650, 650, 'restroom', 'Restrooms', 
-                'Additional facilities near the cafeteria.',
+            addMarker(542, 832, 'restroom', 'Participant Restrooms', 
+                'Participant Restrooms',
                 null);
 
             // ACTIVITIES Examples
@@ -646,13 +647,62 @@
                 null);
 
             // PHOTO SPOTS Examples
-            addMarker(250, 450, 'photos', 'School Sign Photo Op', 
-                'Perfect spot for photos with the school sign!',
-                null);
+            addMarker(586, 235, 'photos', 'Competition Space', 
+                'Competition Space',
+                'IMG_8399.jpeg');
 
-            addMarker(650, 550, 'photos', 'Mascot Photo Booth', 
-                'Meet the mascot and take photos! Available 2-4pm.',
-                null);
+            addMarker(554, 249, 'photos', 'Entry Hallway', 
+                'Gym Side Entry Hallway',
+                'IMG_8401.jpeg');
+
+            addMarker(604, 263, 'photos', 'Entry Hallway', 
+                'Gym Side Entry Hallway',
+                'IMG_8402.jpeg');
+
+           addMarker(729, 251, 'photos', 'Aux Gym Hallway', 
+                'Hallway leading to Aux Gym',
+                'IMG_8403.jpeg');
+
+            addMarker(784, 213, 'photos', 'Aux Gym ', 
+                'Aux Gym',
+                'IMG_8404.jpeg');
+
+           addMarker(822, 237, 'photos', 'Aux Gym Hallway Reverse', 
+                'Hallway to Aux Gym, looking back towards front of school',
+                'IMG_8405.jpeg');
+
+            addMarker(618, 238, 'photos', 'Gym Foyer Area', 
+                'Gym Foyer Area',
+                'IMG_8406.jpeg');
+
+            addMarker(626, 304, 'photos', 'Main Hallway From Gym', 
+                'Main Hallway From the Gym',
+                'IMG_8407.jpeg');
+
+            addMarker(602, 902, 'photos', 'Cafeteria', 
+                'Cafeteria',
+                'IMG_8408.jpeg');
+
+            addMarker(622, 927, 'photos', 'Cafeteria', 
+                'Cafeteria',
+                'IMG_8409.jpeg');
+
+            addMarker(373, 837, 'photos', 'Main Entrance', 
+                'Main Entrance',
+                'IMG_8410.jpeg');
+
+            addMarker(441, 1053, 'photos', 'Outdoor Tent', 
+                'Outdoor Tent',
+                'IMG_8412.jpeg');
+
+            addMarker(483, 738, 'photos', 'Staff Lounge / Judges Room', 
+                'Staff Lounge / Judges Room',
+                'IMG_8415.jpeg');
+
+            addMarker(459, 770, 'photos', 'Staff Lounge / Judges Room', 
+                'Staff Lounge / Judges Room',
+                'IMG_8416.jpeg');
+
 
             // ==========================================
             // WALKING PATHS
@@ -699,66 +749,70 @@
             // Add semi-transparent shapes to highlight specific areas
             // ==========================================
 
-            // Example: Staging Area (rectangle)
+            // Competition Space
             addRectangle(
-                [100, 100],      // Top-left corner [y, x]
-                [250, 300],      // Bottom-right corner [y, x]
-                'Staging Area',  // Label
+                [765, 30],      // Top-left corner [y, x]
+                [563, 226],      // Bottom-right corner [y, x]
+                'Competition Space',  // Label
                 {
                     fillColor: '#FF6B6B',    // Red fill
-                    fillOpacity: 0.3,        // 30% transparent
+                    fillOpacity: 0.2,        // 30% transparent
                     color: '#FF0000',        // Red border
                     weight: 3,
-                    description: 'Staff and volunteers staging area. Restricted access.'
+                    description: 'Competition space.  Access limited during performances.'
                 }
             );
 
-            // Example: Performance Area (polygon - custom shape)
+            // Equipment Warm Up
+            addRectangle(
+                [879, 22],      // Top-left corner [y, x]
+                [787, 210],      // Bottom-right corner [y, x]
+                'Equipment Warm Up Space',  // Label
+                {
+                    fillColor: '#FF6B6B',    // Red fill
+                    fillOpacity: 0.2,        // 30% transparent
+                    color: '#FF0000',        // Red border
+                    weight: 3,
+                    description: 'Competition space.  Access limited during performances.'
+                }
+            );
+            // Body Warm Up Area (polygon - custom shape)
             addArea(
                 [
-                    [350, 400],   // Point 1
-                    [350, 700],   // Point 2
-                    [500, 700],   // Point 3
-                    [500, 400]    // Point 4
+                    [429, 934],   // Point 1
+                    [495, 857],   // Point 2
+                    [537, 904],   // Point 3
+                    [484, 965]    // Point 4
                 ],
-                'Performance Stage',
+                'Body Warm Up area',
                 {
                     fillColor: '#9B59B6',    // Purple
                     fillOpacity: 0.25,
                     color: '#8E44AD',
                     weight: 2,
-                    description: 'Main performance area. Live music from 2-5pm.'
+                    description: 'Body Warm Up Area'
                 }
             );
 
-            // Example: Food Court Zone
-            addRectangle(
-                [450, 550],
-                [600, 750],
-                'Food Court',
-                {
-                    fillColor: '#F39C12',    // Orange
-                    fillOpacity: 0.2,
-                    color: '#E67E22'
-                }
-            );
-
-            // Example: Irregular shaped area (parking lot)
+            // Team Staging Area (polygon - custom shape)
             addArea(
                 [
-                    [100, 200],
-                    [150, 350],
-                    [200, 340],
-                    [180, 180]
+                    [462, 1000],   // Point 1
+                    [574, 865],   // Point 2
+                    [626, 926],   // Point 3
+                    [513, 1061]    // Point 4
                 ],
-                'Parking Zone A',
+                'Body Warm Up area',
                 {
-                    fillColor: '#3498DB',    // Blue
-                    fillOpacity: 0.15,
-                    color: '#2980B9',
-                    weight: 2
+                    fillColor: '#9B59B6',    // Purple
+                    fillOpacity: 0.25,
+                    color: '#8E44AD',
+                    weight: 2,
+                    description: 'Body Warm Up Area'
                 }
             );
+
+            
 
             // ==========================================
             // TO ADD YOUR OWN AREAS:
