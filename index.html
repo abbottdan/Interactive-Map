@@ -494,11 +494,11 @@
                         const endPoint = coordinates[pathLength - 1];
                         const beforeEnd = coordinates[pathLength - 2];
                         
-                        // Calculate angle: from beforeEnd TO endPoint
-                        // atan2(dy, dx) where dy = y2-y1, dx = x2-x1
-                        const dx = endPoint[1] - beforeEnd[1];  // x difference
-                        const dy = endPoint[0] - beforeEnd[0];  // y difference
-                        const angle = Math.atan2(dx, dy) * 180 / Math.PI;
+                        // Calculate angle: from beforeMid TO midPoint
+                        // In Leaflet, Y increases downward, so we need to flip it
+                        const dx = midPoint[1] - beforeMid[1];  // x difference (left-right)
+                        const dy = -(midPoint[0] - beforeMid[0]);  // y difference (NEGATED because Y axis is flipped)
+                        const angle = (Math.atan2(dy, dx) * 180 / Math.PI) - 90;  // -90 to point arrow forward
                         
                         const arrowIcon = L.divIcon({
                             html: `<div style="
