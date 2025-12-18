@@ -498,7 +498,7 @@
                         // In Leaflet, Y increases downward, so we need to flip it
                         const dx = endPoint[1] - beforeEnd[1];  // x difference (left-right)
                         const dy = -(endPoint[0] - beforeEnd[0]);  // y difference (NEGATED because Y axis is flipped)
-                        const angle = (Math.atan2(dy, dx) * 180 / Math.PI) - 90;  // -90 to point arrow forward
+                        const angle = (Math.atan2(dy, dx) * 180 / Math.PI) + 90;  // -90 to point arrow forward
                         
                         const arrowIcon = L.divIcon({
                             html: `<div style="transform: rotate(${angle}deg);">
@@ -529,7 +529,7 @@
                         // In Leaflet, Y increases downward, so we need to flip it
                         const dx = midPoint[1] - beforeMid[1];  // x difference (left-right)
                         const dy = -(midPoint[0] - beforeMid[0]);  // y difference (NEGATED because Y axis is flipped)
-                        const angle = (Math.atan2(dy, dx) * 180 / Math.PI) - 90;  // -90 to point arrow forward
+                        const angle = (Math.atan2(dy, dx) * 180 / Math.PI) + 90;  // -90 to point arrow forward
                         
                         const arrowIcon = L.divIcon({
                             html: `<div style="transform: rotate(${angle}deg);">
